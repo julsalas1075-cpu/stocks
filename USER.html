@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User – Request Item</title>
+    <link rel="stylesheet" href="USER.css">
+</head>
+<body>
+
+<div class="header">USER REQUEST PAGE</div>
+
+<div class="container">
+
+    <h2>Request New Item</h2>
+
+    <div class="form-box">
+        <label>Item Name</label>
+        <input id="reqName" type="text">
+
+        <label>Quantity</label>
+        <input id="reqQty" type="number">
+
+        <button class="btn" onclick="submitRequest()">Submit Request</button>
+    </div>
+
+    <h2>Your Requests</h2>
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Qty</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="userBody"></tbody>
+    </table>
+
+</div>
+
+<script src="USER.js"></script>
+
+</body>
+</html>

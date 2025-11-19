@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="ADMIN.css">
+</head>
+<body>
+
+<div class="header">ADMIN DASHBOARD</div>
+
+<div class="container">
+    <div class="card-container">
+        <div class="card">
+            <h3>Total Items</h3>
+            <p id="totalItems">0</p>
+        </div>
+        <div class="card">
+            <h3>Low Stock</h3>
+            <p id="lowStock">0</p>
+        </div>
+        <div class="card">
+            <h3>Pending Approvals</h3>
+            <p id="pendingCount">0</p>
+        </div>
+    </div>
+
+    <div class="section-title">Inventory Items</div>
+    <button class="btn" onclick="openAddModal()">+ Add Item</button>
+
+    <table id="inventoryTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Unit</th>
+                <th>Qty</th>
+                <th>Threshold</th>
+                <th>Location</th>
+                <th>Supplier</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Add Item Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <h2>Add New Item</h2>
+        <label>Name</label>
+        <input id="itemName" type="text">
+
+        <label>Category</label>
+        <input id="itemCategory" type="text">
+
+        <label>Unit</label>
+        <input id="itemUnit" type="text">
+
+        <label>Quantity</label>
+        <input id="itemQty" type="number">
+
+        <label>Reorder Threshold</label>
+        <input id="itemThreshold" type="number">
+
+        <label>Location</label>
+        <input id="itemLocation" type="text">
+
+        <label>Supplier</label>
+        <input id="itemSupplier" type="text">
+
+        <div class="modal-buttons">
+            <button class="btn cancel" onclick="closeAddModal()">Cancel</button>
+            <button class="btn" onclick="addItem()">Add Item</button>
+        </div>
+    </div>
+</div>
+
+<script src="ADMIN.js"></script>
+</body>
+</html>
