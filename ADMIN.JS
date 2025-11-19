@@ -1,19 +1,14 @@
-// Fixed ADMIN.js — matches your admin.html / ADMIN.css
 
-// Load items from localStorage (ensure inventory variable)
 let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
 
-// Save to localStorage
 function saveInventory() {
     localStorage.setItem("inventory", JSON.stringify(inventory));
 }
 
-// Helper to get tbody (matches your HTML table id="inventoryTable")
 function getTbody() {
     return document.querySelector('#inventoryTable tbody');
 }
 
-// Update dashboard counters
 function updateDashboard() {
     document.getElementById("totalItems").innerText = inventory.length;
     const low = inventory.filter(i => {
@@ -26,7 +21,6 @@ function updateDashboard() {
     document.getElementById("pendingCount").innerText = pending;
 }
 
-// Render inventory table
 function renderInventory() {
     const tbody = getTbody();
     if (!tbody) return;
@@ -35,7 +29,6 @@ function renderInventory() {
     inventory.forEach((item, index) => {
         const tr = document.createElement('tr');
 
-        // low-stock class if qty < threshold (if threshold provided)
         const qty = Number(item.qty) || 0;
         const threshold = Number(item.threshold) || 0;
         if (threshold > 0 && qty < threshold) tr.classList.add('low-stock');
@@ -64,9 +57,8 @@ function renderInventory() {
     updateDashboard();
 }
 
-// Open Add Modal (called by your HTML onclick)
 function openAddModal() {
-    // clear fields
+    
     document.getElementById("itemName").value = "";
     document.getElementById("itemCategory").value = "";
     document.getElementById("itemUnit").value = "";
@@ -75,22 +67,22 @@ function openAddModal() {
     document.getElementById("itemLocation").value = "";
     document.getElementById("itemSupplier").value = "";
 
-    // store mode
+ 
     document.getElementById("addModal").dataset.mode = "add";
-    // show modal (your CSS expects .modal to be display:none; make it flex)
+  
     const modal = document.getElementById("addModal");
     if (modal) modal.style.display = "flex";
 }
 
-// Close Add Modal (called by your HTML)
+
 function closeAddModal() {
     const modal = document.getElementById("addModal");
     if (modal) modal.style.display = "none";
-    // remove editIndex if any
+  
     delete modal.dataset.editIndex;
 }
 
-// Add Item (called by your HTML button inside modal)
+
 function addItem() {
     const name = document.getElementById("itemName").value.trim();
     if (!name) {
@@ -109,7 +101,7 @@ function addItem() {
     const mode = modal && modal.dataset.mode ? modal.dataset.mode : "add";
 
     if (mode === "edit" && modal.dataset.editIndex != null) {
-        // edit existing
+        
         const idx = Number(modal.dataset.editIndex);
         if (!Number.isNaN(idx) && inventory[idx]) {
             inventory[idx].name = name;
@@ -122,7 +114,7 @@ function addItem() {
             inventory[idx].updatedAt = new Date().toISOString();
         }
     } else {
-        // new item defaults to Pending (as requested earlier)
+     
         inventory.push({
             name,
             category,
@@ -141,7 +133,6 @@ function addItem() {
     closeAddModal();
 }
 
-// Open modal to edit existing item (keeps same modal UI)
 function openEditModal(index) {
     const item = inventory[index];
     if (!item) return;
@@ -162,7 +153,6 @@ function openEditModal(index) {
     }
 }
 
-// Delete item
 function deleteItem(index) {
     if (!confirm("Are you sure you want to delete this item?")) return;
     inventory.splice(index, 1);
@@ -170,7 +160,7 @@ function deleteItem(index) {
     renderInventory();
 }
 
-// Approve item (set status to Active)
+
 function approveItem(index) {
     if (!inventory[index]) return;
     inventory[index].status = "Active";
@@ -178,7 +168,7 @@ function approveItem(index) {
     renderInventory();
 }
 
-// Deny item (set status to Rejected)
+
 function denyItem(index) {
     if (!inventory[index]) return;
     inventory[index].status = "Rejected";
@@ -186,7 +176,6 @@ function denyItem(index) {
     renderInventory();
 }
 
-// small utility to escape HTML for safety when injecting text
 function escapeHtml(text) {
     if (!text && text !== 0) return "";
     return String(text)
@@ -197,9 +186,8 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
-// initialize on first load
 document.addEventListener("DOMContentLoaded", () => {
-    // ensure modal closes if clicking outside modal-content
+    
     const modal = document.getElementById("addModal");
     if (modal) {
         modal.addEventListener("click", (e) => {
