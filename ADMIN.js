@@ -1,212 +1,149 @@
-// Fixed ADMIN.js — matches your admin.html / ADMIN.css
+// admin-firebase.js — realtime admin UI using Firebase Realtime Database (compat)
+// Assumes firebase-config.js has already initialized firebase
 
-// Load items from localStorage (ensure inventory variable)
-let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+const dbRef = firebase.database().ref('inventory');
 
-// Save to localStorage
-function saveInventory() {
-    localStorage.setItem("inventory", JSON.stringify(inventory));
-}
-
-// Helper to get tbody (matches your HTML table id="inventoryTable")
-function getTbody() {
-    return document.querySelector('#inventoryTable tbody');
-}
-
-// Update dashboard counters
-function updateDashboard() {
-    document.getElementById("totalItems").innerText = inventory.length;
-    const low = inventory.filter(i => {
-        const th = Number(i.threshold) || 0;
-        const q = Number(i.qty) || 0;
-        return th > 0 ? q < th : false;
-    }).length;
-    document.getElementById("lowStock").innerText = low;
-    const pending = inventory.filter(i => (i.status || "").toLowerCase() === "pending").length;
-    document.getElementById("pendingCount").innerText = pending;
-}
-
-// Render inventory table
-function renderInventory() {
-    const tbody = getTbody();
-    if (!tbody) return;
-    tbody.innerHTML = "";
-
-    inventory.forEach((item, index) => {
-        const tr = document.createElement('tr');
-
-        // low-stock class if qty < threshold (if threshold provided)
-        const qty = Number(item.qty) || 0;
-        const threshold = Number(item.threshold) || 0;
-        if (threshold > 0 && qty < threshold) tr.classList.add('low-stock');
-
-        const statusText = item.status ? item.status : "Active";
-
-        tr.innerHTML = `
-            <td>${escapeHtml(item.name)}</td>
-            <td>${escapeHtml(item.category || "")}</td>
-            <td>${escapeHtml(item.unit || "")}</td>
-            <td>${qty}</td>
-            <td>${threshold}</td>
-            <td>${escapeHtml(item.location || "")}</td>
-            <td>${escapeHtml(item.supplier || "")}</td>
-            <td class="${statusText.toLowerCase()}">${escapeHtml(statusText)}</td>
-            <td>
-                <button class="btn" onclick="openEditModal(${index})">Edit</button>
-                <button class="btn" onclick="deleteItem(${index})">Delete</button>
-                ${ (statusText.toLowerCase() === "pending") ? `<button class="btn" onclick="approveItem(${index})">Approve</button>
-                <button class="btn" onclick="denyItem(${index})">Deny</button>` : "" }
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    updateDashboard();
-}
-
-// Open Add Modal (called by your HTML onclick)
-function openAddModal() {
-    // clear fields
-    document.getElementById("itemName").value = "";
-    document.getElementById("itemCategory").value = "";
-    document.getElementById("itemUnit").value = "";
-    document.getElementById("itemQty").value = "";
-    document.getElementById("itemThreshold").value = "";
-    document.getElementById("itemLocation").value = "";
-    document.getElementById("itemSupplier").value = "";
-
-    // store mode
-    document.getElementById("addModal").dataset.mode = "add";
-    // show modal (your CSS expects .modal to be display:none; make it flex)
-    const modal = document.getElementById("addModal");
-    if (modal) modal.style.display = "flex";
-}
-
-// Close Add Modal (called by your HTML)
-function closeAddModal() {
-    const modal = document.getElementById("addModal");
-    if (modal) modal.style.display = "none";
-    // remove editIndex if any
-    delete modal.dataset.editIndex;
-}
-
-// Add Item (called by your HTML button inside modal)
-function addItem() {
-    const name = document.getElementById("itemName").value.trim();
-    if (!name) {
-        alert("Name is required");
-        return;
-    }
-
-    const category = document.getElementById("itemCategory").value.trim();
-    const unit = document.getElementById("itemUnit").value.trim();
-    const qty = Number(document.getElementById("itemQty").value) || 0;
-    const threshold = Number(document.getElementById("itemThreshold").value) || 0;
-    const location = document.getElementById("itemLocation").value.trim();
-    const supplier = document.getElementById("itemSupplier").value.trim();
-
-    const modal = document.getElementById("addModal");
-    const mode = modal && modal.dataset.mode ? modal.dataset.mode : "add";
-
-    if (mode === "edit" && modal.dataset.editIndex != null) {
-        // edit existing
-        const idx = Number(modal.dataset.editIndex);
-        if (!Number.isNaN(idx) && inventory[idx]) {
-            inventory[idx].name = name;
-            inventory[idx].category = category;
-            inventory[idx].unit = unit;
-            inventory[idx].qty = qty;
-            inventory[idx].threshold = threshold;
-            inventory[idx].location = location;
-            inventory[idx].supplier = supplier;
-            inventory[idx].updatedAt = new Date().toISOString();
-        }
-    } else {
-        // new item defaults to Pending (as requested earlier)
-        inventory.push({
-            name,
-            category,
-            unit,
-            qty,
-            threshold,
-            location,
-            supplier,
-            status: "Pending",
-            createdAt: new Date().toISOString()
-        });
-    }
-
-    saveInventory();
-    renderInventory();
-    closeAddModal();
-}
-
-// Open modal to edit existing item (keeps same modal UI)
-function openEditModal(index) {
-    const item = inventory[index];
-    if (!item) return;
-
-    document.getElementById("itemName").value = item.name || "";
-    document.getElementById("itemCategory").value = item.category || "";
-    document.getElementById("itemUnit").value = item.unit || "";
-    document.getElementById("itemQty").value = item.qty || 0;
-    document.getElementById("itemThreshold").value = item.threshold || 0;
-    document.getElementById("itemLocation").value = item.location || "";
-    document.getElementById("itemSupplier").value = item.supplier || "";
-
-    const modal = document.getElementById("addModal");
-    if (modal) {
-        modal.dataset.mode = "edit";
-        modal.dataset.editIndex = String(index);
-        modal.style.display = "flex";
-    }
-}
-
-// Delete item
-function deleteItem(index) {
-    if (!confirm("Are you sure you want to delete this item?")) return;
-    inventory.splice(index, 1);
-    saveInventory();
-    renderInventory();
-}
-
-// Approve item (set status to Active)
-function approveItem(index) {
-    if (!inventory[index]) return;
-    inventory[index].status = "Active";
-    saveInventory();
-    renderInventory();
-}
-
-// Deny item (set status to Rejected)
-function denyItem(index) {
-    if (!inventory[index]) return;
-    inventory[index].status = "Rejected";
-    saveInventory();
-    renderInventory();
-}
-
-// small utility to escape HTML for safety when injecting text
+// Helpers
 function escapeHtml(text) {
-    if (!text && text !== 0) return "";
-    return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+  if (text === undefined || text === null) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
-// initialize on first load
-document.addEventListener("DOMContentLoaded", () => {
-    // ensure modal closes if clicking outside modal-content
-    const modal = document.getElementById("addModal");
-    if (modal) {
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) closeAddModal();
-        });
-    }
+function updateDashboardCounts(items) {
+  const total = items.length;
+  const low = items.filter(i => (Number(i.threshold) || 0) > 0 && Number(i.qty || 0) < Number(i.threshold || 0)).length;
+  const pending = items.filter(i => (i.status || '').toLowerCase() === 'pending').length;
+  document.getElementById('totalItems').innerText = total;
+  document.getElementById('lowStock').innerText = low;
+  document.getElementById('pendingCount').innerText = pending;
+}
 
-    renderInventory();
-    updateDashboard();
+function render(items) {
+  const tbody = document.getElementById('inventory-body');
+  tbody.innerHTML = '';
+
+  items.forEach((item) => {
+    const tr = document.createElement('tr');
+    const qty = Number(item.qty || 0);
+    const threshold = Number(item.threshold || 0);
+    if (threshold > 0 && qty < threshold) tr.classList.add('low-stock');
+
+    const statusText = item.status || 'Active';
+
+    tr.innerHTML = `
+      <td>${escapeHtml(item.name)}</td>
+      <td>${escapeHtml(item.category || '')}</td>
+      <td>${escapeHtml(item.unit || '')}</td>
+      <td>${qty}</td>
+      <td>${threshold}</td>
+      <td>${escapeHtml(item.location || '')}</td>
+      <td>${escapeHtml(item.supplier || '')}</td>
+      <td class="${(statusText).toLowerCase()}">${escapeHtml(statusText)}</td>
+      <td>
+        <button class="btn" onclick="openEdit('${item._id}')">Edit</button>
+        <button class="btn" onclick="removeItem('${item._id}')">Delete</button>
+        ${ (statusText.toLowerCase() === 'pending') ? `<button class="btn" onclick="approveItem('${item._id}')">Approve</button>
+        <button class="btn" onclick="denyItem('${item._id}')">Deny</button>` : '' }
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+
+  updateDashboardCounts(items);
+}
+
+// Listen for realtime updates
+dbRef.on('value', snapshot => {
+  const data = snapshot.val() || {};
+  // convert to array with _id
+  const items = Object.keys(data).map(k => ({ _id: k, ...data[k] }));
+  render(items);
 });
+
+// Add or update item (save button)
+document.getElementById('saveItemBtn').addEventListener('click', () => {
+  const modal = document.getElementById('addModal');
+  const mode = modal.dataset.mode || 'add';
+
+  const name = document.getElementById('itemName').value.trim();
+  if (!name) { alert('Name required'); return; }
+  const category = document.getElementById('itemCategory').value.trim();
+  const unit = document.getElementById('itemUnit').value.trim();
+  const qty = Number(document.getElementById('itemQty').value) || 0;
+  const threshold = Number(document.getElementById('itemThreshold').value) || 0;
+  const location = document.getElementById('itemLocation').value.trim();
+  const supplier = document.getElementById('itemSupplier').value.trim();
+
+  if (mode === 'edit' && modal.dataset.editId) {
+    const id = modal.dataset.editId;
+    firebase.database().ref('inventory/' + id).update({
+      name, category, unit, qty, threshold, location, supplier, updatedAt: Date.now()
+    });
+  } else {
+    // push new (status Pending)
+    const newRef = firebase.database().ref('inventory').push();
+    newRef.set({ name, category, unit, qty, threshold, location, supplier, status: 'Pending', createdAt: Date.now() });
+  }
+
+  closeAddModal();
+});
+
+function openAddModal() {
+  document.getElementById('itemName').value = '';
+  document.getElementById('itemCategory').value = '';
+  document.getElementById('itemUnit').value = '';
+  document.getElementById('itemQty').value = '';
+  document.getElementById('itemThreshold').value = '';
+  document.getElementById('itemLocation').value = '';
+  document.getElementById('itemSupplier').value = '';
+  const modal = document.getElementById('addModal');
+  modal.dataset.mode = 'add';
+  delete modal.dataset.editId;
+  modal.style.display = 'flex';
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').style.display = 'none';
+}
+
+function openEdit(id) {
+  firebase.database().ref('inventory/' + id).once('value').then(snap => {
+    const item = snap.val();
+    if (!item) return;
+    document.getElementById('itemName').value = item.name || '';
+    document.getElementById('itemCategory').value = item.category || '';
+    document.getElementById('itemUnit').value = item.unit || '';
+    document.getElementById('itemQty').value = item.qty || '';
+    document.getElementById('itemThreshold').value = item.threshold || '';
+    document.getElementById('itemLocation').value = item.location || '';
+    document.getElementById('itemSupplier').value = item.supplier || '';
+
+    const modal = document.getElementById('addModal');
+    modal.dataset.mode = 'edit';
+    modal.dataset.editId = id;
+    modal.style.display = 'flex';
+  });
+}
+
+function removeItem(id) {
+  if (!confirm('Delete this item?')) return;
+  firebase.database().ref('inventory/' + id).remove();
+}
+
+function approveItem(id) {
+  firebase.database().ref('inventory/' + id).update({ status: 'Active' });
+}
+
+function denyItem(id) {
+  firebase.database().ref('inventory/' + id).update({ status: 'Rejected' });
+}
+
+// close modal when clicking outside content
+const modalRoot = document.getElementById('addModal');
+if (modalRoot) modalRoot.addEventListener('click', e => { if (e.target === modalRoot) closeAddModal(); });
