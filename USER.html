@@ -1,85 +1,52 @@
+<!-- Complete Firebase User Page Without Sign-In -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>User Requests (Auth)</title>
-  <link rel="stylesheet" href="USER.css">
-
-  <!-- Firebase (compat CDN) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-  <!-- Your firebase config (must exist in repo) -->
-  <script src="firebase-config.js"></script>
-  <script>firebase.initializeApp(firebaseConfig);</script>
+    <meta charset="UTF-8">
+    <title>User Page</title>
 </head>
 <body>
-  <header class="header">
-    <div class="left">
-      <img src="/mnt/data/39edc523-3329-4963-9bbc-fd01de6e34fc.png" alt="logo" class="logo">
-      <h1>User Requests</h1>
-    </div>
-    <div class="right" id="authControls">
-      <!-- Auth UI will be rendered here -->
-      <button id="showLogin" class="btn">Sign in</button>
-    </div>
-  </header>
+<h1>User Page</h1>
+<p>This version has NO login and allows ADMIN to add users properly.</p>
 
-  <main class="container">
-    <section class="user-panel" id="signedOutPanel">
-      <p>You must sign in to submit requests.</p>
-    </section>
+<!-- User List -->
+<div id="userList"></div>
 
-    <section class="user-panel hidden" id="signedInPanel">
-      <div class="user-info">
-        <span id="userEmail"></span>
-        <button id="signOutBtn" class="btn">Sign out</button>
-      </div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-      <h2>Submit Request</h2>
-      <div class="form-grid">
-        <label>Name<input id="reqName" type="text" placeholder="Item name"></label>
-        <label>Category<input id="reqCategory" type="text" placeholder="Optional"></label>
-        <label>Quantity<input id="reqQty" type="number" min="1" value="1"></label>
-        <label>Note<input id="reqNote" type="text" placeholder="Optional note"></label>
-      </div>
-      <div class="form-actions">
-        <button id="submitReq" class="btn primary">Submit Request</button>
-      </div>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCguysIlysXrxoUVzvxwIegkkzjWHxJ9_s",
+        authDomain: "something-951af.firebaseapp.com",
+        databaseURL: "https://something-951af-default-rtdb.firebaseio.com/",
+        projectId: "something-951af",
+        storageBucket: "something-951af.appspot.com",
+        messagingSenderId: "473657927594",
+        appId: "1:473657927594:web:c62149f5b6a77ae8182dd3"
+    };
 
-      <h3>Your Requests</h3>
-      <table id="userTable">
-        <thead><tr><th>Item</th><th>Qty</th><th>Status</th><th>When</th></tr></thead>
-        <tbody id="userBody"></tbody>
-      </table>
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-      <h3>Inventory (read-only)</h3>
-      <table id="invTable">
-        <thead><tr><th>Name</th><th>Qty</th><th>Threshold</th><th>Status</th></tr></thead>
-        <tbody id="invBody"></tbody>
-      </table>
-    </section>
+    // AUTO LOAD USERS
+    const userListDiv = document.getElementById("userList");
 
-    <!-- Simple modal for Login/Register -->
-    <div id="authModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 id="authTitle">Sign in</h2>
-        <input id="email" type="email" placeholder="Email">
-        <input id="password" type="password" placeholder="Password">
-        <div class="modal-actions">
-          <button id="authToggle" class="btn">Switch to Register</button>
-          <div style="margin-left:auto">
-            <button id="authCancel" class="btn">Cancel</button>
-            <button id="authSubmit" class="btn primary">Submit</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    const usersRef = ref(db, "users");
+    onValue(usersRef, (snapshot) => {
+        const data = snapshot.val();
+        userListDiv.innerHTML = "";
 
-  </main>
+        if (!data) {
+            userListDiv.innerHTML = "<p>No users found.</p>";
+            return;
+        }
 
-  <script src="USER.js"></script>
+        Object.keys(data).forEach(id => {
+            const user = data[id];
+            userListDiv.innerHTML += `<p><b>${user.name}</b> - ${user.balance}</p>`;
+        });
+    });
+</script>
 </body>
 </html>
