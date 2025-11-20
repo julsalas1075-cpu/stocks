@@ -1,44 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User – Request Item</title>
-    <link rel="stylesheet" href="USER.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Requests (Auth)</title>
+  <link rel="stylesheet" href="USER.css">
+
+  <!-- Firebase (compat CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <!-- Your firebase config (must exist in repo) -->
+  <script src="firebase-config.js"></script>
+  <script>firebase.initializeApp(firebaseConfig);</script>
 </head>
 <body>
+  <header class="header">
+    <div class="left">
+      <img src="/mnt/data/39edc523-3329-4963-9bbc-fd01de6e34fc.png" alt="logo" class="logo">
+      <h1>User Requests</h1>
+    </div>
+    <div class="right" id="authControls">
+      <!-- Auth UI will be rendered here -->
+      <button id="showLogin" class="btn">Sign in</button>
+    </div>
+  </header>
 
-<div class="header">USER REQUEST PAGE</div>
+  <main class="container">
+    <section class="user-panel" id="signedOutPanel">
+      <p>You must sign in to submit requests.</p>
+    </section>
 
-<div class="container">
+    <section class="user-panel hidden" id="signedInPanel">
+      <div class="user-info">
+        <span id="userEmail"></span>
+        <button id="signOutBtn" class="btn">Sign out</button>
+      </div>
 
-    <h2>Request New Item</h2>
+      <h2>Submit Request</h2>
+      <div class="form-grid">
+        <label>Name<input id="reqName" type="text" placeholder="Item name"></label>
+        <label>Category<input id="reqCategory" type="text" placeholder="Optional"></label>
+        <label>Quantity<input id="reqQty" type="number" min="1" value="1"></label>
+        <label>Note<input id="reqNote" type="text" placeholder="Optional note"></label>
+      </div>
+      <div class="form-actions">
+        <button id="submitReq" class="btn primary">Submit Request</button>
+      </div>
 
-    <div class="form-box">
-        <label>Item Name</label>
-        <input id="reqName" type="text">
+      <h3>Your Requests</h3>
+      <table id="userTable">
+        <thead><tr><th>Item</th><th>Qty</th><th>Status</th><th>When</th></tr></thead>
+        <tbody id="userBody"></tbody>
+      </table>
 
-        <label>Quantity</label>
-        <input id="reqQty" type="number">
+      <h3>Inventory (read-only)</h3>
+      <table id="invTable">
+        <thead><tr><th>Name</th><th>Qty</th><th>Threshold</th><th>Status</th></tr></thead>
+        <tbody id="invBody"></tbody>
+      </table>
+    </section>
 
-        <button class="btn" onclick="submitRequest()">Submit Request</button>
+    <!-- Simple modal for Login/Register -->
+    <div id="authModal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="authTitle">Sign in</h2>
+        <input id="email" type="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
+        <div class="modal-actions">
+          <button id="authToggle" class="btn">Switch to Register</button>
+          <div style="margin-left:auto">
+            <button id="authCancel" class="btn">Cancel</button>
+            <button id="authSubmit" class="btn primary">Submit</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h2>Your Requests</h2>
-    <table id="userTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Qty</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="userBody"></tbody>
-    </table>
+  </main>
 
-</div>
-
-<script src="USER.js"></script>
-
+  <script src="USER.js"></script>
 </body>
 </html>

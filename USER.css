@@ -1,68 +1,85 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: #f2f2f2;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Requests (Auth)</title>
+  <link rel="stylesheet" href="USER.css">
 
-.header {
-    background: #007bff;
-    padding: 15px;
-    font-size: 26px;
-    color: white;
-    text-align: center;
-}
+  <!-- Firebase (compat CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-.container {
-    width: 90%;
-    max-width: 700px;
-    margin: 20px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-}
+  <!-- Your firebase config (must exist in repo) -->
+  <script src="firebase-config.js"></script>
+  <script>firebase.initializeApp(firebaseConfig);</script>
+</head>
+<body>
+  <header class="header">
+    <div class="left">
+      <img src="/mnt/data/39edc523-3329-4963-9bbc-fd01de6e34fc.png" alt="logo" class="logo">
+      <h1>User Requests</h1>
+    </div>
+    <div class="right" id="authControls">
+      <!-- Auth UI will be rendered here -->
+      <button id="showLogin" class="btn">Sign in</button>
+    </div>
+  </header>
 
-.form-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 25px;
-}
+  <main class="container">
+    <section class="user-panel" id="signedOutPanel">
+      <p>You must sign in to submit requests.</p>
+    </section>
 
-input {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid gray;
-    border-radius: 5px;
-}
+    <section class="user-panel hidden" id="signedInPanel">
+      <div class="user-info">
+        <span id="userEmail"></span>
+        <button id="signOutBtn" class="btn">Sign out</button>
+      </div>
 
-.btn {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 12px;
-    cursor: pointer;
-    border-radius: 6px;
-    font-size: 16px;
-}
+      <h2>Submit Request</h2>
+      <div class="form-grid">
+        <label>Name<input id="reqName" type="text" placeholder="Item name"></label>
+        <label>Category<input id="reqCategory" type="text" placeholder="Optional"></label>
+        <label>Quantity<input id="reqQty" type="number" min="1" value="1"></label>
+        <label>Note<input id="reqNote" type="text" placeholder="Optional note"></label>
+      </div>
+      <div class="form-actions">
+        <button id="submitReq" class="btn primary">Submit Request</button>
+      </div>
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
+      <h3>Your Requests</h3>
+      <table id="userTable">
+        <thead><tr><th>Item</th><th>Qty</th><th>Status</th><th>When</th></tr></thead>
+        <tbody id="userBody"></tbody>
+      </table>
 
-th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-}
+      <h3>Inventory (read-only)</h3>
+      <table id="invTable">
+        <thead><tr><th>Name</th><th>Qty</th><th>Threshold</th><th>Status</th></tr></thead>
+        <tbody id="invBody"></tbody>
+      </table>
+    </section>
 
-.status {
-    padding: 5px 10px;
-    border-radius: 5px;
-    color: white;
-}
+    <!-- Simple modal for Login/Register -->
+    <div id="authModal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="authTitle">Sign in</h2>
+        <input id="email" type="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
+        <div class="modal-actions">
+          <button id="authToggle" class="btn">Switch to Register</button>
+          <div style="margin-left:auto">
+            <button id="authCancel" class="btn">Cancel</button>
+            <button id="authSubmit" class="btn primary">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-.approved { background: green; }
-.denied { background: red; }
-.pending { background: orange; }
+  </main>
+
+  <script src="USER.js"></script>
+</body>
+</html>

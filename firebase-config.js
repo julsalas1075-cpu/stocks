@@ -1,11 +1,9 @@
 // firebase-config.js
-// Paste this file to your GitHub Pages project and include it before admin-firebase.js / user-firebase.js
-
-// Firebase config (you provided these values)
+// Replace the values with your project values if you change them later.
 const firebaseConfig = {
   apiKey: "AIzaSyCguysIlysXrxoUVzvxwIegkkzjWHxJ9_s",
   authDomain: "something-951af.firebaseapp.com",
-  databaseURL: "https://something-951af-default-rtdb.firebaseio.com",
+  databaseURL: "https://something-951af-default-rtdb.firebaseio.com/",
   projectId: "something-951af",
   storageBucket: "something-951af.firebasestorage.app",
   messagingSenderId: "473657927594",
@@ -13,6 +11,4 @@ const firebaseConfig = {
   measurementId: "G-PYC7WHT7RT"
 };
 
-// Initialize Firebase (compat SDK used in HTML pages)
-firebase.initializeApp(firebaseConfig);
-// optional: firebase.analytics(); // only if analytics script loaded
+// NOTE: We use the compat CDN scripts in the HTML files and call `firebase.initializeApp(firebaseConfig)` there.

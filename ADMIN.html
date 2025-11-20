@@ -1,84 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="ADMIN.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - Inventory</title>
+  <link rel="stylesheet" href="ADMIN.css">
 </head>
 <body>
-
-<div class="header">ADMIN DASHBOARD</div>
-
-<div class="container">
-    <div class="card-container">
-        <div class="card">
-            <h3>Total Items</h3>
-            <p id="totalItems">0</p>
-        </div>
-        <div class="card">
-            <h3>Low Stock</h3>
-            <p id="lowStock">0</p>
-        </div>
-        <div class="card">
-            <h3>Pending Approvals</h3>
-            <p id="pendingCount">0</p>
-        </div>
+  <header class="header">
+    <div class="left">
+      <img src="/mnt/data/39edc523-3329-4963-9bbc-fd01de6e34fc.png" alt="logo" class="logo" />
+      <h1>ADMIN DASHBOARD</h1>
     </div>
+    <div class="right">
+      <button id="addBtn" class="btn primary">+ Add Item</button>
+    </div>
+  </header>
 
-    <div class="section-title">Inventory Items</div>
-    <button class="btn" onclick="openAddModal()">+ Add Item</button>
+  <main class="container">
+    <section class="cards">
+      <div class="card">Total Items<br/><span id="totalItems">0</span></div>
+      <div class="card">Low Stock<br/><span id="lowStock">0</span></div>
+      <div class="card">Pending<br/><span id="pendingCount">0</span></div>
+    </section>
 
-    <table id="inventoryTable">
+    <section class="controls">
+      <input id="search" placeholder="Search by name or SKU..." />
+      <select id="filterCategory"><option value="">All categories</option></select>
+    </section>
+
+    <section class="table-wrap">
+      <table id="inventoryTable">
         <thead>
-            <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Unit</th>
-                <th>Qty</th>
-                <th>Threshold</th>
-                <th>Location</th>
-                <th>Supplier</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Unit</th>
+            <th>Qty</th>
+            <th>Threshold</th>
+            <th>Location</th>
+            <th>Supplier</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
         </thead>
-        <tbody></tbody>
-    </table>
-</div>
+        <tbody id="inventory-body"></tbody>
+      </table>
+    </section>
 
-<!-- Add Item Modal -->
-<div id="addModal" class="modal">
+    <section class="reports">
+      <h3>Category Summary</h3>
+      <div id="categoryReport"></div>
+
+      <h3>Low-stock History (daily)</h3>
+      <div id="dailyLowStock"></div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
     <div class="modal-content">
-        <h2>Add New Item</h2>
-        <label>Name</label>
-        <input id="itemName" type="text">
-
-        <label>Category</label>
-        <input id="itemCategory" type="text">
-
-        <label>Unit</label>
-        <input id="itemUnit" type="text">
-
-        <label>Quantity</label>
-        <input id="itemQty" type="number">
-
-        <label>Reorder Threshold</label>
-        <input id="itemThreshold" type="number">
-
-        <label>Location</label>
-        <input id="itemLocation" type="text">
-
-        <label>Supplier</label>
-        <input id="itemSupplier" type="text">
-
-        <div class="modal-buttons">
-            <button class="btn cancel" onclick="closeAddModal()">Cancel</button>
-            <button class="btn" onclick="addItem()">Add Item</button>
-        </div>
+      <h2 id="modalTitle">Add Item</h2>
+      <div class="form-grid">
+        <label>Name<input id="itemName" type="text"></label>
+        <label>Category<input id="itemCategory" type="text"></label>
+        <label>Unit<input id="itemUnit" type="text"></label>
+        <label>Quantity<input id="itemQty" type="number" min="0"></label>
+        <label>Reorder Threshold<input id="itemThreshold" type="number" min="0"></label>
+        <label>Location<input id="itemLocation" type="text"></label>
+        <label>Supplier<input id="itemSupplier" type="text"></label>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelBtn" class="btn">Cancel</button>
+        <button id="saveBtn" class="btn primary">Save</button>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="ADMIN.js"></script>
+  <!-- Firebase CDN (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script src="firebase-config.js"></script>
+  <script>
+    // initialize
+    firebase.initializeApp(firebaseConfig);
+  </script>
+  <script src="ADMIN.js"></script>
 </body>
 </html>
