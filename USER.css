@@ -1,85 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>User Requests (Auth)</title>
-  <link rel="stylesheet" href="USER.css">
-
-  <!-- Firebase (compat CDN) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-  <!-- Your firebase config (must exist in repo) -->
-  <script src="firebase-config.js"></script>
-  <script>firebase.initializeApp(firebaseConfig);</script>
-</head>
-<body>
-  <header class="header">
-    <div class="left">
-      <img src="/mnt/data/39edc523-3329-4963-9bbc-fd01de6e34fc.png" alt="logo" class="logo">
-      <h1>User Requests</h1>
-    </div>
-    <div class="right" id="authControls">
-      <!-- Auth UI will be rendered here -->
-      <button id="showLogin" class="btn">Sign in</button>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="user-panel" id="signedOutPanel">
-      <p>You must sign in to submit requests.</p>
-    </section>
-
-    <section class="user-panel hidden" id="signedInPanel">
-      <div class="user-info">
-        <span id="userEmail"></span>
-        <button id="signOutBtn" class="btn">Sign out</button>
-      </div>
-
-      <h2>Submit Request</h2>
-      <div class="form-grid">
-        <label>Name<input id="reqName" type="text" placeholder="Item name"></label>
-        <label>Category<input id="reqCategory" type="text" placeholder="Optional"></label>
-        <label>Quantity<input id="reqQty" type="number" min="1" value="1"></label>
-        <label>Note<input id="reqNote" type="text" placeholder="Optional note"></label>
-      </div>
-      <div class="form-actions">
-        <button id="submitReq" class="btn primary">Submit Request</button>
-      </div>
-
-      <h3>Your Requests</h3>
-      <table id="userTable">
-        <thead><tr><th>Item</th><th>Qty</th><th>Status</th><th>When</th></tr></thead>
-        <tbody id="userBody"></tbody>
-      </table>
-
-      <h3>Inventory (read-only)</h3>
-      <table id="invTable">
-        <thead><tr><th>Name</th><th>Qty</th><th>Threshold</th><th>Status</th></tr></thead>
-        <tbody id="invBody"></tbody>
-      </table>
-    </section>
-
-    <!-- Simple modal for Login/Register -->
-    <div id="authModal" class="modal hidden">
-      <div class="modal-content">
-        <h2 id="authTitle">Sign in</h2>
-        <input id="email" type="email" placeholder="Email">
-        <input id="password" type="password" placeholder="Password">
-        <div class="modal-actions">
-          <button id="authToggle" class="btn">Switch to Register</button>
-          <div style="margin-left:auto">
-            <button id="authCancel" class="btn">Cancel</button>
-            <button id="authSubmit" class="btn primary">Submit</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </main>
-
-  <script src="USER.js"></script>
-</body>
-</html>
+:root{--primary:#1e88e5;--muted:#6b7280}
+*{box-sizing:border-box}
+body{font-family:Inter,Arial,Helvetica,sans-serif;background:#f5f7fa;margin:0;color:#222}
+.header{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:var(--primary);color:#fff}
+.header .left{display:flex;align-items:center;gap:12px}
+.logo{height:40px;border-radius:6px;background:#fff;padding:3px}
+.header h1{margin:0;font-size:18px}
+.container{max-width:960px;margin:18px auto;padding:18px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.05)}
+.hidden{display:none}
+.user-info{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-grid label{display:flex;flex-direction:column;font-size:14px}
+.form-grid input{padding:8px;border:1px solid #ddd;border-radius:6px}
+.form-actions{display:flex;justify-content:flex-end;margin-bottom:18px}
+.btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+.btn.primary{background:var(--primary);color:#fff}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+.status.Pending{color:#ff9800;font-weight:700}
+.status.Approved{color:#2e7d32;font-weight:700}
+.status.Rejected{color:#e53935;font-weight:700}
+/* modal */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5)}
+.modal .modal-content{background:#fff;padding:16px;border-radius:8px;width:320px;display:flex;flex-direction:column;gap:8px}
+.modal .modal-actions{display:flex;align-items:center;gap:8px}
+@media(max-width:700px){.form-grid{grid-template-columns:1fr}.container{margin:8px;padding:12px}}
